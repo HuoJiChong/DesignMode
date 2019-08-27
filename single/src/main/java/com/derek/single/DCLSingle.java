@@ -1,8 +1,8 @@
 package com.derek.single;
 
-/*import java.io.Serializable;*/
+import java.io.Serializable;
 
-public class DCLSingle /*implements Serializable */{
+public class DCLSingle implements Serializable {
     private DCLSingle(){
 
     }

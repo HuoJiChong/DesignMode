@@ -1,10 +1,14 @@
 package com.derek.single;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 
 public class Main {
@@ -39,11 +43,17 @@ public class Main {
      * @throws Exception
      */
     public static void serializationAttack() throws Exception {
-        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("serFile"));
-        DCLSingle s1 = DCLSingle.class.newInstance();
+
+        Constructor constructor = DCLSingle.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+        DCLSingle s1 = (DCLSingle) constructor.newInstance();
         outputStream.writeObject(s1);
 
-        ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File("serFile")));
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        ObjectInputStream inputStream = new ObjectInputStream(byteArrayInputStream);
         DCLSingle s2 = (DCLSingle)inputStream.readObject();
         s1.tellEveryone();
         s2.tellEveryone();
