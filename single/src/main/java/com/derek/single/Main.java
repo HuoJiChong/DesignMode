@@ -10,6 +10,7 @@ public class Main {
 
     public static void main(String [] argv){
         try {
+            reflectionAttack();
             serializationAttack();
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,6 +53,6 @@ public class Main {
         DCLSingle s2 = (DCLSingle)inputStream.readObject();
         s1.tellEveryone();
         s2.tellEveryone();
-        System.out.println(s1 == s2);
+        System.out.println( s1 == s2 );
     }
 }
