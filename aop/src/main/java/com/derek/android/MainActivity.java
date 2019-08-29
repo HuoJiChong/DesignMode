@@ -1,12 +1,12 @@
 package com.derek.android;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.derek.aop.annotation.BehaviorTrace;
-import com.derek.aop.annotation.DebugTrace;
+import com.derek.android.aop.annotation.BehaviorTrace;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,13 +16,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    @BehaviorTrace(value = "click",type = 1)
-    public void onClick(View v){
-        Log.i("derek","  click   ");
+    @BehaviorTrace(value = "mShake",type = 1)
+    public  void mShake(View view)
+    {
+        SystemClock.sleep(3000);
+        Log.i("derek","  mShake   ");
     }
 
-    @DebugTrace
-    public void onShake(View v){
-
+    public void onAopTest(View v){
+        Log.i("derek","  onAopTest   ");
     }
+
 }

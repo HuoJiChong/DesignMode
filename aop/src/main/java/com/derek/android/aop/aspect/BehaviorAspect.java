@@ -1,9 +1,10 @@
-package com.derek.aop.aspect;
+package com.derek.android.aop.aspect;
 
 import android.util.Log;
 
-import com.derek.aop.annotation.BehaviorTrace;
-import com.derek.aop.internal.StopWatch;
+
+import com.derek.android.aop.annotation.BehaviorTrace;
+import com.derek.android.aop.internal.StopWatch;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -18,11 +19,12 @@ import java.util.Date;
 public class BehaviorAspect {
     private static final String TAG = "dongnao";
     SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String BEHAVIORTRACE_POINTCUT_METHOD = "execution(@com.derek.android.aop.annotation.BehaviorTrace  * *(..))";
     /**
      * 如何切蛋糕，切成什么样的形状
      * 切点
      */
-    @Pointcut("execution(@com.derek.aop.annotation.BehaviorTrace  * *(..))")
+    @Pointcut(BEHAVIORTRACE_POINTCUT_METHOD)
     public void annoBehavior()
     {
 
@@ -43,7 +45,7 @@ public class BehaviorAspect {
         BehaviorTrace behaviorTrace=methodSignature.getMethod().getAnnotation(BehaviorTrace.class);
         String contentType=behaviorTrace.value();
         int type=behaviorTrace.type();
-        Log.i(TAG,contentType+"使用时间：   "+simpleDateFormat.format(new Date()));
+        Log.i(TAG," type: " + type +"  value: " + contentType+"使用时间：   "+simpleDateFormat.format(new Date()) );
         final StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         //方法执行时

@@ -2,7 +2,7 @@
  * Copyright (C) 2014 android10.org. All rights reserved.
  * @author Fernando Cejas (the android10 coder)
  */
-package com.derek.aop.annotation;
+package com.derek.android.aop.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

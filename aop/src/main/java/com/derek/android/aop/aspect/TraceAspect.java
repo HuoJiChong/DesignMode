@@ -2,10 +2,11 @@
  * Copyright (C) 2014 android10.org. All rights reserved.
  * @author Fernando Cejas (the android10 coder)
  */
-package com.derek.aop.aspect;
+package com.derek.android.aop.aspect;
 
-import com.derek.aop.internal.DebugLog;
-import com.derek.aop.internal.StopWatch;
+
+import com.derek.android.aop.internal.DebugLog;
+import com.derek.android.aop.internal.StopWatch;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
