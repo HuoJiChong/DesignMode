@@ -1,6 +1,10 @@
 package com.derek.single;
 
-public class InnerClassSingle {
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+
+public final class InnerClassSingle implements Serializable {
+    private static final long serialVersionUID = 0L;
     private InnerClassSingle(){
 
     }
@@ -25,5 +29,14 @@ public class InnerClassSingle {
 
     public void tellEveryone(){
         System.out.println("This is a InnerClassSingle  " + this.hashCode());
+    }
+
+    /**
+     * 可以让开发人员控制对象的反序列化。
+     * @return
+     * @throws ObjectStreamException
+     */
+    private Object readResolve() throws ObjectStreamException {
+        return  SingleHolder.instance;
     }
 }

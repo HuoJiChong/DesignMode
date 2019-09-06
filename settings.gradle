@@ -1,1 +1,1 @@
-include ':JavaClass', ':single', ':myapp', ':AOP'
+include ':JavaClass', ':single', ':AOP', ':framework'

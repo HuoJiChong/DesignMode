@@ -42,6 +42,7 @@ public class BehaviorAspect {
     {
         //方法执行前
         MethodSignature methodSignature= (MethodSignature) point.getSignature();
+//        获得注解，注解必须是 @Retention(RetentionPolicy.RUNTIME)
         BehaviorTrace behaviorTrace=methodSignature.getMethod().getAnnotation(BehaviorTrace.class);
         String contentType=behaviorTrace.value();
         int type=behaviorTrace.type();

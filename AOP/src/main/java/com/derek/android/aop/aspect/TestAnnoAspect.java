@@ -10,6 +10,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
+import java.util.Calendar;
+
 @Aspect
 public class TestAnnoAspect {
 
@@ -26,7 +28,11 @@ public class TestAnnoAspect {
     @Around("pointcut()")
     public void around(ProceedingJoinPoint joinPoint) throws Throwable {
         System.out.println("@Around");
-        joinPoint.proceed();
+//        防止多次点击
+        long currentClickTime = Calendar.getInstance().getTimeInMillis();
+        if (currentClickTime - lastClickTime > clickInterval){
+            joinPoint.proceed();
+        }
     }
 
     @After("pointcut()")
@@ -44,4 +50,8 @@ public class TestAnnoAspect {
         System.out.println("@afterThrowing");
         System.out.println("ex = " + ex.getMessage());
     }
+
+    private static long lastClickTime = 0;
+    private static long clickInterval = 600;
+
 }
