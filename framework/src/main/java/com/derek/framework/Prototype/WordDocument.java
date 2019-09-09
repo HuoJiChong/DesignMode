@@ -2,6 +2,10 @@ package com.derek.framework.Prototype;
 
 import java.util.ArrayList;
 
+/**
+ * Cloneable 是一个标识接口，标志这个这个类是可拷贝的，
+ * clone()方法是重写的Object方法。
+ */
 public class WordDocument implements Cloneable {
     private String mText;
     private ArrayList<String> mImages = new ArrayList<>();
