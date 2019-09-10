@@ -15,4 +15,9 @@ public class MacBook extends Computer {
     public void setOS() {
         mOS = "MAC OS X 14.6";
     }
+
+
+    void text(){
+
+    }
 }
