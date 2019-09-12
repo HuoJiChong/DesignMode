@@ -15,6 +15,8 @@ import com.derek.framework.Handler.Request2;
 import com.derek.framework.Handler.Request3;
 import com.derek.framework.Handler.base.AbstractHandler;
 import com.derek.framework.Handler.base.AbstractRequest;
+import com.derek.framework.Observer.Coder;
+import com.derek.framework.Observer.DevTechFrontier;
 import com.derek.framework.State.TvController;
 import com.derek.framework.Strategy.BusStrategy;
 import com.derek.framework.Strategy.TranficCalculator;
@@ -28,7 +30,7 @@ import java.util.List;
 public class Client {
     public static void main(String argv[]){
 
-        expressionTest();
+        observerTest();
     }
 
     public void intent(){
@@ -84,6 +86,22 @@ public class Client {
         Calculator calculator = new Calculator("23 + 34 + 56");
         System.out.println(calculator.calculate());
 
+    }
+
+    static void observerTest(){
+        DevTechFrontier frontier = new DevTechFrontier();
+
+        Coder mrSample = new Coder("mr.sample");
+        Coder coder1 = new Coder("coder1");
+        Coder coder2 = new Coder("coder2");
+        Coder coder3 = new Coder("coder3");
+
+        frontier.addObserver(mrSample);
+        frontier.addObserver(coder1);
+        frontier.addObserver(coder2);
+        frontier.addObserver(coder3);
+
+        frontier.postNewPublication("新一期的内容发布啦。。。");
     }
 
 }
