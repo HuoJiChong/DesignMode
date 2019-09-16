@@ -13,17 +13,17 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 class SubscriberMethodHunter {
-    Map<EventType,CopyOnWriteArrayList<Subscription>> mSubcriberMap;
+    private Map<EventType,CopyOnWriteArrayList<Subscription>> mSubcriberMap;
 
-    public SubscriberMethodHunter(Map<EventType, CopyOnWriteArrayList<Subscription>> mSubcriberMap) {
+    SubscriberMethodHunter(Map<EventType, CopyOnWriteArrayList<Subscription>> mSubcriberMap) {
         this.mSubcriberMap = mSubcriberMap;
     }
 
     /**
-     *
-     * @param subscriber
+     * 找到订阅者的所有方法
+     * @param subscriber 订阅者
      */
-    public void findSubcribeMethods(Object subscriber) {
+     void findSubcribeMethods(Object subscriber) {
         if (mSubcriberMap == null){
             throw new NullPointerException("the mSubscriberMap is null");
         }
@@ -32,25 +32,25 @@ class SubscriberMethodHunter {
 
         while (clazz != null && !isSystemClass(clazz.getName())){
             final Method[] allMethods = clazz.getDeclaredMethods();
-            int methodLength = allMethods.length;
-            for (int i = 0;i < methodLength;i++){
-                Method method = allMethods[i];
 
+            for (Method method : allMethods){
+                //根据注解查找对应的方法
                 Subscriber annotation = method.getAnnotation(Subscriber.class);
                 if (annotation != null){
+                    // 方法参数类型数组
                     Class<?>[] paramsTypeClass = method.getParameterTypes();
 
                     if (paramsTypeClass.length == 1){
                         Class<?> paramType = convertType(paramsTypeClass[0]);
                         EventType eventType = new EventType(paramType,annotation.tag());
-
+                        // 注册的目标方法
                         TargetMethod subcriberMethod = new TargetMethod(method,eventType,annotation.mode());
 
                         subscibe(eventType,subcriberMethod,subscriber);
                     }
                 }
             }
-
+            //查找父类class类型，以便后续查找父类中符合要求的订阅方法。
             clazz = clazz.getSuperclass();
         }
     }
@@ -62,6 +62,7 @@ class SubscriberMethodHunter {
      * @param subscriber 订阅者
      */
     private void subscibe(EventType eventType, TargetMethod method, Object subscriber) {
+        // 根据事件类型找到所有 订阅列表
         CopyOnWriteArrayList<Subscription> subscriptions = mSubcriberMap.get(eventType);
         if (subscriptions == null){
             subscriptions = new CopyOnWriteArrayList<>();
@@ -79,15 +80,16 @@ class SubscriberMethodHunter {
     /**
      * remove subscriber methods from map
      *
-     * @param subscriber
+     * @param subscriber 订阅者
      */
-    public void removeMethodsFromMap(Object subscriber) {
+    void removeMethodsFromMap(Object subscriber) {
         Iterator<CopyOnWriteArrayList<Subscription>> iterator = mSubcriberMap
                 .values().iterator();
         while (iterator.hasNext()) {
             CopyOnWriteArrayList<Subscription> subscriptions = iterator.next();
             if (subscriptions != null) {
-                List<Subscription> foundSubscriptions = new LinkedList<Subscription>();
+                List<Subscription> foundSubscriptions = new LinkedList<>();
+
                 Iterator<Subscription> subIterator = subscriptions.iterator();
                 while (subIterator.hasNext()) {
                     Subscription subscription = subIterator.next();
@@ -119,7 +121,7 @@ class SubscriberMethodHunter {
      * Object type. for example, int to Integer.
      *
      * @param eventType origin Event Type
-     * @return
+     * @return 对应的类对象
      */
     private Class<?> convertType(Class<?> eventType) {
         Class<?> returnClass = eventType;

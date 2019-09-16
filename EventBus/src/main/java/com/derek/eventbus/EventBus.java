@@ -1,7 +1,5 @@
 package com.derek.eventbus;
 
-import android.print.PrinterId;
-
 import com.derek.eventbus.handler.AsyncEventHandler;
 import com.derek.eventbus.handler.DefaultEventHandler;
 import com.derek.eventbus.handler.EventHandler;
@@ -33,10 +31,10 @@ public final class EventBus {
     /**
      * constructor with desc
      *
-     * @param desc the descriptor of eventbus
+     * @param desc the descriptor of event bus
      */
     public EventBus(String desc) {
-        mDesc = desc;
+        this.mDesc = desc;
     }
 
     private static class EventBusHolder{
@@ -49,8 +47,11 @@ public final class EventBus {
 
     private final Map<EventType,CopyOnWriteArrayList<Subscription>> mSubcriberMap = new ConcurrentHashMap<>();
 
-    SubscriberMethodHunter mMethodHunter = new SubscriberMethodHunter(mSubcriberMap);
+    private SubscriberMethodHunter mMethodHunter = new SubscriberMethodHunter(mSubcriberMap);
 
+    /**
+     * @param subscriber 注册订阅的对象
+     */
     public void register(Object subscriber){
         if (subscriber == null){
             return;
@@ -70,42 +71,47 @@ public final class EventBus {
         }
     }
 
-
-    /**
-     * 发布
-     */
     /**
      * local event queue
      */
-    ThreadLocal<Queue<EventType>> mLocalEvents = new ThreadLocal<Queue<EventType>>(){
+    private ThreadLocal<Queue<EventType>> mLocalEvents = new ThreadLocal<Queue<EventType>>(){
         @Override
         protected Queue<EventType> initialValue() {
-            return new ConcurrentLinkedQueue<EventType>();
+            return new ConcurrentLinkedQueue<>();
         }
     };
 
-    EventDispatcher mDispatcher = new EventDispatcher();
+    private EventDispatcher mDispatcher = new EventDispatcher();
 
-
+    /**
+     * @param event 1234,true,new User("1234")
+     */
     public void post(Object event) {
         post(event, EventType.DEFAULT_TAG);
     }
 
-
     /**
      * 发布事件
-     * @param event
-     * @param tag
+     * @param event 发布事件
+     * @param tag tag
      */
     public void post(Object event,String tag){
-        mLocalEvents.get().offer(new EventType(event.getClass(),tag));
-        mDispatcher.dispatchEvents(event);
+        try{
+            Queue<EventType> queues = mLocalEvents.get();
+            if (queues != null)
+                queues.offer(new EventType(event.getClass(),tag));
+
+            mDispatcher.dispatchEvents(event);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
      * 事件分发器
      */
-    class EventDispatcher {
+    private class EventDispatcher {
         EventHandler mUIThreadEventHandler = new UIThreadEventHandler();
         EventHandler mPostThreadHandler = new DefaultEventHandler();
         EventHandler mAsyncEventHandler = new AsyncEventHandler();
@@ -117,9 +123,10 @@ public final class EventBus {
          */
         MatchPolicy mMatchPolicy = new DefaultMatchPolicy();
 
+        // 发布事件
         void dispatchEvents(Object event) {
             Queue<EventType> eventsQueue = mLocalEvents.get();
-            while (eventsQueue.size() > 0){
+            while (eventsQueue != null && eventsQueue.size() > 0){
                 deliveryEvent(eventsQueue.poll(),event);
             }
         }
@@ -140,6 +147,7 @@ public final class EventBus {
             }
         }
 
+        // 处理单个事件
         private void handleEvent(EventType eventType, Object event) {
             List<Subscription> subscriptions = mSubcriberMap.get(eventType);
             if (subscriptions == null) {

@@ -2,6 +2,9 @@ package com.derek.eventbus.type;
 
 import android.support.annotation.NonNull;
 
+/**
+ * 记录参数类型和
+ */
 public class EventType {
     public static final String DEFAULT_TAG = "default";
     public String tag = DEFAULT_TAG;
