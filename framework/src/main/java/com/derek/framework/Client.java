@@ -22,22 +22,28 @@ import com.derek.framework.Strategy.BusStrategy;
 import com.derek.framework.Strategy.TranficCalculator;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Client {
-    public static void main(String argv[]){
+    public static void main(String argv[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-        observerTest();
+        Class clazz = Class.forName("com.derek.framework.Client");
+        Object obj = clazz.newInstance();
+        Method method = clazz.getMethod("methodTest",String.class);
+        method.setAccessible(true);
+        method.invoke(obj," string");
+
+//        threadLocalTest();
     }
 
     public void intent(){
         Intent sharedIntent = new Intent();
         sharedIntent.clone();
-
-
     }
 
     static void factoryTest(){
@@ -102,6 +108,31 @@ public class Client {
         frontier.addObserver(coder3);
 
         frontier.postNewPublication("新一期的内容发布啦。。。");
+    }
+
+    static void threadLocalTest(){
+        final ThreadLocalTest test = new ThreadLocalTest();
+        test.set();
+        test.print();
+        Thread t = new Thread(){
+            @Override
+            public void run() {
+                test.set();
+                test.print();
+            }
+        };
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        test.print();
+    }
+
+    public void methodTest(String name){
+        System.out.println("methodTest：" + name);
     }
 
 }
