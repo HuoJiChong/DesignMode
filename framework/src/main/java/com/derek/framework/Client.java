@@ -20,6 +20,9 @@ import com.derek.framework.Observer.DevTechFrontier;
 import com.derek.framework.State.TvController;
 import com.derek.framework.Strategy.BusStrategy;
 import com.derek.framework.Strategy.TranficCalculator;
+import com.derek.framework.Visitor.BusinessReport;
+import com.derek.framework.Visitor.CEOVisitor;
+import com.derek.framework.Visitor.CTOVisitor;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -30,15 +33,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class Client {
-    public static void main(String argv[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static void main(String argv[]){
 
-        Class clazz = Class.forName("com.derek.framework.Client");
-        Object obj = clazz.newInstance();
-        Method method = clazz.getMethod("methodTest",String.class);
-        method.setAccessible(true);
-        method.invoke(obj," string");
-
-//        threadLocalTest();
+        visitorTest();
     }
 
     public void intent(){
@@ -133,6 +130,17 @@ public class Client {
 
     public void methodTest(String name){
         System.out.println("methodTest：" + name);
+    }
+
+
+    static void visitorTest(){
+        BusinessReport report = new BusinessReport();
+        System.out.println("==========给CEO看的报表==============");
+        report.showReport(new CEOVisitor());
+
+        System.out.println("==========给CTO看的报表==============");
+        report.showReport(new CTOVisitor());
+
     }
 
 }
