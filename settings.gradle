@@ -1,1 +1,1 @@
-include ':JavaClass', ':single', ':AOP', ':framework', ':app', ':db', ':EventBus','mydagger'
+include ':JavaClass', ':single', ':AOP', ':framework', ':app', ':db', ':EventBus'
