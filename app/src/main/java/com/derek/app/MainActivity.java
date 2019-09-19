@@ -1,18 +1,16 @@
 package com.derek.app;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.derek.app.Memo.NoteCaretaker;
-import com.derek.app.Memo.NoteEditText;
 import com.derek.eventbus.EventBus;
 import com.derek.eventbus.annotation.Subscriber;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
-    NoteEditText et;
     NoteCaretaker caretaker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +20,6 @@ public class MainActivity extends FragmentActivity {
 //        EventBus.getDefault().register(this);
 
         caretaker = new NoteCaretaker();
-        et = findViewById(R.id.edit_text);
     }
 
     static int a = 0;
@@ -63,24 +60,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void onNoteClick(View v){
-        int id = v.getId();
-        switch (id){
-            case R.id.btn_note_pre:
-            {
-                et.restore(caretaker.getPreMemo());
-            }
-                break;
-            case R.id.btn_note_save:
-            {
-                caretaker.saveMemo(et.createMemo());
-            }
-                break;
-            case R.id.btn_note_next:
-            {
-                et.restore(caretaker.getNextMemo());
-            }
-                break;
-        }
+
     }
 
 
