@@ -17,6 +17,9 @@ import com.derek.framework.Handler.base.AbstractHandler;
 import com.derek.framework.Handler.base.AbstractRequest;
 import com.derek.framework.Observer.Coder;
 import com.derek.framework.Observer.DevTechFrontier;
+import com.derek.framework.Proxy.Consignor;
+import com.derek.framework.Proxy.DynamicProxy;
+import com.derek.framework.Proxy.ILawsuit;
 import com.derek.framework.State.TvController;
 import com.derek.framework.Strategy.BusStrategy;
 import com.derek.framework.Strategy.TranficCalculator;
@@ -27,6 +30,7 @@ import com.derek.framework.Visitor.CTOVisitor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +39,7 @@ import java.util.List;
 public class Client {
     public static void main(String argv[]){
 
-        visitorTest();
+        dynamicTest();
     }
 
     public void intent(){
@@ -140,6 +144,23 @@ public class Client {
 
         System.out.println("==========给CTO看的报表==============");
         report.showReport(new CTOVisitor());
+
+    }
+
+    /**
+     * 动态代理
+     */
+    static void dynamicTest(){
+        ILawsuit consignor = new Consignor();
+        DynamicProxy proxy = new DynamicProxy(consignor);
+        ClassLoader loader = consignor.getClass().getClassLoader();
+
+        ILawsuit lawyer = (ILawsuit) Proxy.newProxyInstance(loader,new Class[]{ILawsuit.class},proxy);
+
+        lawyer.submit();
+        lawyer.defend();
+        lawyer.burden();
+        lawyer.finish();
 
     }
 
