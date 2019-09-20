@@ -16,6 +16,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".binder.BankService"
+            android:process="com.derek.BankService">
+            <intent-filter>
+                <action android:name="com.derek.app.binder.BankService"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
