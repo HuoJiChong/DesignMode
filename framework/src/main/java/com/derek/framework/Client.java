@@ -2,11 +2,18 @@ package com.derek.framework;
 
 import android.content.Intent;
 
+import com.derek.framework.Decorator.Boy;
+import com.derek.framework.Decorator.CheapCloth;
+import com.derek.framework.Decorator.ExpensiveCloth;
+import com.derek.framework.Decorator.Person;
+import com.derek.framework.Decorator.PersonCloth;
 import com.derek.framework.Expression.Calculator;
 import com.derek.framework.Factory.AudiCar;
 import com.derek.framework.Factory.AudiCarFactory;
 import com.derek.framework.Factory.AudiFactory;
 import com.derek.framework.Factory.AudiQ3;
+import com.derek.framework.Flyweight.Ticket;
+import com.derek.framework.Flyweight.TicketFactory;
 import com.derek.framework.Handler.Handler1;
 import com.derek.framework.Handler.Handler2;
 import com.derek.framework.Handler.Handler3;
@@ -35,11 +42,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Client {
     public static void main(String argv[]){
 
-        dynamicTest();
+        ticket();
     }
 
     public void intent(){
@@ -136,7 +144,6 @@ public class Client {
         System.out.println("methodTest：" + name);
     }
 
-
     static void visitorTest(){
         BusinessReport report = new BusinessReport();
         System.out.println("==========给CEO看的报表==============");
@@ -162,6 +169,25 @@ public class Client {
         lawyer.burden();
         lawyer.finish();
 
+    }
+
+    static void decorator(){
+        Person boy = new Boy();
+        PersonCloth  expensiveCloth = new ExpensiveCloth(boy);
+        expensiveCloth.dressed();
+        System.out.println("=====================");
+        PersonCloth cheapCloth = new CheapCloth(boy);
+        cheapCloth.dressed();
+    }
+
+    static void ticket(){
+
+        for (int i = 0;i<1000;i++){
+            int from = new Random().nextInt(100);
+            int to = new Random().nextInt(100);
+            Ticket ticket = TicketFactory.getTicket("" + from,"" + to);
+            ticket.showTicketInfo("上铺");
+        }
     }
 
 }
