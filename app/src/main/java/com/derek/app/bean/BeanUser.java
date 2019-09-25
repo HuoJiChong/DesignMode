@@ -16,10 +16,10 @@
 
 package com.derek.app.bean;
 
-public class User {
+public class BeanUser {
     public String name;
 
-    public User(String aName) {
+    public BeanUser(String aName) {
         name = aName;
     }
 
@@ -44,7 +44,7 @@ public class User {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        User other = (User) obj;
+        BeanUser other = (BeanUser) obj;
         if (name == null) {
             if (other.name != null)
                 return false;

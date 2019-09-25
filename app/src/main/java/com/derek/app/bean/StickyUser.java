@@ -24,7 +24,7 @@
 
 package com.derek.app.bean;
 
-public class StickyUser extends User {
+public class StickyUser extends BeanUser {
 
     public StickyUser(String aName) {
         super(aName + " - Sticky");

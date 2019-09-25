@@ -12,14 +12,26 @@ import android.view.View;
 
 import com.derek.app.Memo.NoteCaretaker;
 import com.derek.app.binder.BankService;
+import com.derek.app.db.User;
+import com.derek.app.db.UserDao;
+import com.derek.db.DaoFactory;
+import com.derek.db.IBaseDao;
 import com.derek.eventbus.EventBus;
 import com.derek.eventbus.annotation.Subscriber;
 
+import java.util.List;
+
 public class MainActivity extends Activity {
 
+    private static final String TAG = MainActivity.class.getName();
     private IBankAIDL mBankBinder;
 
     NoteCaretaker caretaker;
+
+    IBaseDao<User> userDao;
+    private static final String dbPwd = "123456";
+    private static final String dbName = "teacher.db";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +42,10 @@ public class MainActivity extends Activity {
         bindService(new Intent(this,BankService.class),conn,BIND_AUTO_CREATE);
 
         caretaker = new NoteCaretaker();
+
+        // 数据库测试
+        DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
+        userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
     }
 
     static int a = 0;
@@ -43,7 +59,13 @@ public class MainActivity extends Activity {
                 break;
             case R.id.btn_query:
             {
-                EventBus.getDefault().post(10);
+                User where=new User();
+                where.setName("teacher");
+                where.setUser_Id(10);
+                List<User> list=userDao.query(where);
+
+                Log.i(TAG,"查询到  "+ ((list == null) ? "0" : list.size() )+"  条数据");
+
             }
                 break;
             case R.id.btn_open:
@@ -55,6 +77,45 @@ public class MainActivity extends Activity {
                 }
             }
                 break;
+            case R.id.btn_insert:
+            {
+                for (int i = 0;i<10;i++)
+                {
+                    User user=new User(i,"teacher","123456");
+                    userDao.insert(user);
+                }
+            }
+                break;
+
+            case R.id.btn_update:
+            {
+                User user=new User(10,"teacher","123456");
+//                userDao.insert(user);
+//                userDao.delete(user);
+                User entity = new User(100,"derek","check");
+
+                userDao.update(entity,user);
+            }
+                break;
+
+            case R.id.btn_delete:
+            {
+                User user=new User(10,"teacher","123456");
+//                userDao.insert(user);
+                userDao.delete(user);
+            }
+                break;
+
+            case R.id.btn_log:
+            {
+                User where = new User();
+                List<User> list=userDao.query(where);
+                for (int i = 0;i<list.size();i++){
+                    Log.e("derek", list.get(i).toString());
+                }
+            }
+                break;
+
             default:
                 break;
         }
@@ -103,11 +164,9 @@ public class MainActivity extends Activity {
 //    };
 
 
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        EventBus.getDefault().unregister(this);
+        unbindService(conn);
     }
 }

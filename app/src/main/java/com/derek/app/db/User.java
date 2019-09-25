@@ -1,4 +1,4 @@
-package com.derek.app;
+package com.derek.app.db;
 
 import com.derek.db.annotation.DbFiled;
 import com.derek.db.annotation.DbTable;
@@ -12,6 +12,9 @@ public class User {
     //123456
     @DbFiled("password")
     public String password;
+
+    public User() {
+    }
 
     public User(int user_Id, String name, String password) {
         this.user_Id = user_Id;
@@ -45,7 +48,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "BeanUser{" +
                 "user_Id=" + user_Id +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +

@@ -37,6 +37,14 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/btn_log"
+        android:text="LOG DATA"
+        android:onClick="onClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <Button
         android:id="@+id/btn_broad"
         android:text="broad"
         android:onClick="onClick"
