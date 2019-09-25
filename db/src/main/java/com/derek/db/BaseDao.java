@@ -178,25 +178,22 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
          */
         while (filedsIterator.hasNext())
         {
-            /**
-             *
-             */
             Field colmunToFiled=filedsIterator.next();
             String cacheKey;
             String cacheValue=null;
-            if(colmunToFiled.getAnnotation(DbFiled.class)!=null)
-            {
+            if(colmunToFiled.getAnnotation(DbFiled.class)!=null) {
                 cacheKey=colmunToFiled.getAnnotation(DbFiled.class).value();
-            }else
-            {
+            }else {
                 cacheKey=colmunToFiled.getName();
             }
             try {
                 /**
                  * 如果没有赋值，就过滤；
+                 * 此处有bug,在查找的过程中，如果我想查找 "name == teacher"的数据类型，但是不知道id(int 类型)是多少，此时id默认值，就会是0，
+                 * 条件就变成了 "name=teacher && id =0"
                  */
-                if(null==colmunToFiled.get(entity))
-                {
+                Object value = colmunToFiled.get(entity);
+                if(null == value ) {
                     continue;
                 }
                 cacheValue=colmunToFiled.get(entity).toString();
@@ -257,23 +254,17 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
                     Field field= (Field) entry.getValue();
 
                     Class type=field.getType();
-                    if(colmunIndex!=-1)
-                    {
-                        if(type==String.class)
-                        {
+                    if(colmunIndex!=-1) {
+                        if(type==String.class) {
                             //反射方式赋值
                             field.set(item,cursor.getString(colmunIndex));
-                        }else if(type==Double.class)
-                        {
+                        }else if(type==Double.class) {
                             field.set(item,cursor.getDouble(colmunIndex));
-                        }else  if(type==Integer.class)
-                        {
+                        }else  if(type==Integer.class) {
                             field.set(item,cursor.getInt(colmunIndex));
-                        }else if(type==Long.class)
-                        {
+                        }else if(type==Long.class) {
                             field.set(item,cursor.getLong(colmunIndex));
-                        }else  if(type==byte[].class)
-                        {
+                        }else  if(type==byte[].class) {
                             field.set(item,cursor.getBlob(colmunIndex));
                             /*
                             不支持的类型
