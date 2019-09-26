@@ -2,10 +2,10 @@ package com.derek.db;
 
 
 import android.content.Context;
-//import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
-import net.sqlcipher.database.SQLiteDatabase;
+//import net.sqlcipher.database.SQLiteDatabase;
 
 import java.io.File;
 
@@ -25,15 +25,15 @@ public class DaoFactory {
     public void init(Context context,String pwd,String databaseName){
         databasePath = databaseName;
         password = pwd;
-        SQLiteDatabase.loadLibs(context);
+//        SQLiteDatabase.loadLibs(context);
         openDatabase();
         inited = true;
     }
 
     private void openDatabase(){
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + databasePath;
-        sqLiteDatabase = SQLiteDatabase.openOrCreateDatabase(path,this.password,null);
-//        sqLiteDatabase = SQLiteDatabase.openOrCreateDatabase(path,null);
+//        sqLiteDatabase = SQLiteDatabase.openOrCreateDatabase(path,this.password,null);
+        sqLiteDatabase = SQLiteDatabase.openOrCreateDatabase(path,null);
     }
 
     public static DaoFactory getInstance(){

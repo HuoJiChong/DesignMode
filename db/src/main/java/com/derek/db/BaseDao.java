@@ -1,16 +1,16 @@
 package com.derek.db;
 
 import android.content.ContentValues;
-//import android.database.Cursor;
-//import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.derek.db.annotation.DbFiled;
 import com.derek.db.annotation.DbTable;
 
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
+//import net.sqlcipher.Cursor;
+//import net.sqlcipher.database.SQLiteDatabase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -26,7 +26,7 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
     /**
      * 数据库的引用
      */
-    protected net.sqlcipher.database.SQLiteDatabase database;
+    protected SQLiteDatabase database;
     /**
      * 保证实例化一次
      */
@@ -132,7 +132,13 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
 
     @Override
     public int update(T entity, T where) {
-        return 0;
+        Map entityMap = getValues(entity);
+        ContentValues entityValues = getContentValues(entityMap);
+
+        DaoCondition condition = new DaoCondition(getValues(where));
+
+        int result = database.update(this.tableName,entityValues,condition.getWhereClause(),condition.getWhereArgs());
+        return result;
     }
 
     @Override
@@ -192,14 +198,17 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
             try {
                 /**
                  * 如果没有赋值，就过滤；
-                 * 此处有bug,在查找的过程中，如果我想查找 "name == teacher"的数据类型，但是不知道id(int 类型)是多少，此时id默认值，就会是0，
-                 * 条件就变成了 "name=teacher && id =0"
                  */
                 Object value = colmunToFiled.get(entity);
                 if( null == value ) {
                     continue;
                 }
                 try{
+                    /**
+                     * 过滤int 默认值
+                     * 如果我想查找 "name == teacher"的数据类型，但是不知道id(int 类型)是多少，此时id默认值，就会是0，
+                     * 条件就变成了 "name=teacher && id =0"
+                     */
                     Type valueType = value.getClass().getGenericSuperclass();
                     if (valueType.equals(Number.class)){
                         int value2 = Integer.parseInt(value.toString());
@@ -276,7 +285,7 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
                             field.set(item,cursor.getString(colmunIndex));
                         }else if(type==Double.class) {
                             field.set(item,cursor.getDouble(colmunIndex));
-                        }else  if(type==Integer.class) {
+                        }else  if(type==int.class) {
                             field.set(item,cursor.getInt(colmunIndex));
                         }else if(type==Long.class) {
                             field.set(item,cursor.getLong(colmunIndex));
@@ -289,7 +298,6 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
                             continue;
                         }
                     }
-
                 }
                 list.add(item);
             } catch (InstantiationException e) {

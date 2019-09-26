@@ -25,5 +25,5 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //创建数据库失败，模拟器崩溃 native错误，真机没有问题
-    implementation 'net.zetetic:android-database-sqlcipher:4.2.0'
+//    implementation 'net.zetetic:android-database-sqlcipher:4.2.0'
 }
