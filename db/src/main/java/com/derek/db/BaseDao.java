@@ -1,17 +1,19 @@
 package com.derek.db;
 
 import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+//import android.database.Cursor;
+//import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.derek.db.annotation.DbFiled;
 import com.derek.db.annotation.DbTable;
 
-//import net.sqlcipher.Cursor;
-//import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.Cursor;
+import net.sqlcipher.database.SQLiteDatabase;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +26,7 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
     /**
      * 数据库的引用
      */
-    private SQLiteDatabase database;
+    protected net.sqlcipher.database.SQLiteDatabase database;
     /**
      * 保证实例化一次
      */
@@ -46,7 +48,7 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
      */
     private HashMap<String,Field> cacheMap;
 
-    private String tableName;
+    protected String tableName;
 
     protected synchronized boolean init(Class<T> entity, SQLiteDatabase sqLiteDatabase) {
         if(!isInit) {
@@ -151,12 +153,13 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
         Map<String,String> map=getValues(where);
 
         String limitString=null;
-        if(startIndex!=null&&limit!=null)
-        {
+        if(startIndex!=null&&limit!=null) {
             limitString=startIndex+" , "+limit;
         }
 
         DaoCondition condition=new DaoCondition(map);
+        Log.e("derek",condition.getWhereClause());
+//        Log.e("derek",condition.getWhereArgs());
         Cursor cursor=database.query(tableName,null,condition.getWhereClause()
                 ,condition.getWhereArgs(),null,null,orderBy,limitString);
         List<T> result=getResult(cursor,where);
@@ -193,9 +196,22 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
                  * 条件就变成了 "name=teacher && id =0"
                  */
                 Object value = colmunToFiled.get(entity);
-                if(null == value ) {
+                if( null == value ) {
                     continue;
                 }
+                try{
+                    Type valueType = value.getClass().getGenericSuperclass();
+                    if (valueType.equals(Number.class)){
+                        int value2 = Integer.parseInt(value.toString());
+                        if (value2 == 0){
+                            continue;
+                        }
+                    }
+
+                }catch (Exception e){
+
+                }
+
                 cacheValue=colmunToFiled.get(entity).toString();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -226,7 +242,7 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
         return contentValues;
     }
 
-    private List<T> getResult(Cursor cursor, T where) {
+    protected List<T> getResult(Cursor cursor, T where) {
         ArrayList list=new ArrayList();
 
         Object item;
@@ -324,7 +340,7 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
                     list.add(value);
                 }
             }
-            this.whereClause=stringBuilder.toString();
+            this.whereClause = stringBuilder.toString();
             this.whereArgs = (String[]) list.toArray(new String[list.size()]);
 
         }
