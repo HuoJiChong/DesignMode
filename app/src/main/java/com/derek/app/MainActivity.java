@@ -1,12 +1,16 @@
 package com.derek.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 
@@ -37,15 +41,52 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        EventBus.getDefault().register(this);
-
         bindService(new Intent(this,BankService.class),conn,BIND_AUTO_CREATE);
 
         caretaker = new NoteCaretaker();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkPer()){
+                DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
+                userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
+            }
+        }else{
+            DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
+            userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
+        }
         // 数据库测试
-        DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
-        userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private boolean checkPer() {
+        String[] per = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        if(checkSelfPermission(per[0]) == PackageManager.PERMISSION_DENIED){
+            requestPermissions(per,200);
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        boolean granted = true;
+        for (int i = 0;i<grantResults.length;i++){
+             if(checkSelfPermission(permissions[i]) == PackageManager.PERMISSION_DENIED){
+                 granted = false;
+                 break;
+             }
+        }
+        if (granted){
+            DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
+            userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
+        }else {
+            checkPer();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     static int a = 0;
@@ -61,11 +102,8 @@ public class MainActivity extends Activity {
             {
                 User where=new User();
                 where.setName("teacher");
-                where.setUser_Id(10);
                 List<User> list=userDao.query(where);
-
                 Log.i(TAG,"查询到  "+ ((list == null) ? "0" : list.size() )+"  条数据");
-
             }
                 break;
             case R.id.btn_open:
@@ -79,9 +117,9 @@ public class MainActivity extends Activity {
                 break;
             case R.id.btn_insert:
             {
-                for (int i = 0;i<10;i++)
+                for (int i = 1;i<6;i++)
                 {
-                    User user=new User(i,"teacher","123456");
+                    User user=new User(i,"teacher","123456" + i);
                     userDao.insert(user);
                 }
             }
@@ -89,19 +127,15 @@ public class MainActivity extends Activity {
 
             case R.id.btn_update:
             {
-                User user=new User(10,"teacher","123456");
-//                userDao.insert(user);
-//                userDao.delete(user);
+                User user=new User(1,"teacher","1234561");
                 User entity = new User(100,"derek","check");
-
                 userDao.update(entity,user);
             }
                 break;
 
             case R.id.btn_delete:
             {
-                User user=new User(10,"teacher","123456");
-//                userDao.insert(user);
+                User user=new User(2,"teacher","1234562");
                 userDao.delete(user);
             }
                 break;

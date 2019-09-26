@@ -5,7 +5,9 @@ import com.derek.db.annotation.DbTable;
 
 @DbTable("tb_user")
 public class User {
-    public int user_Id=0;
+
+    @DbFiled("user_Id")
+    public Integer user_Id;
 
     @DbFiled("name")
     public String name;
