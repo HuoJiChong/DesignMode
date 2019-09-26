@@ -1,16 +1,16 @@
 package com.derek.db;
 
 import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+//import android.database.Cursor;
+//import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.derek.db.annotation.DbFiled;
 import com.derek.db.annotation.DbTable;
 
-//import net.sqlcipher.Cursor;
-//import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.Cursor;
+import net.sqlcipher.database.SQLiteDatabase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
