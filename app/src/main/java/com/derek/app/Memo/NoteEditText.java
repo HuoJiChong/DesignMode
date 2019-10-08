@@ -2,8 +2,9 @@ package com.derek.app.Memo;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.EditText;
 
-public class NoteEditText extends android.support.v7.widget.AppCompatEditText {
+public class NoteEditText extends EditText {
     public NoteEditText(Context context) {
         super(context);
     }

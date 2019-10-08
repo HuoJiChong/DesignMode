@@ -16,14 +16,9 @@ import android.view.View;
 
 import com.derek.app.Memo.NoteCaretaker;
 import com.derek.app.binder.BankService;
-import com.derek.app.db.User;
-import com.derek.app.db.UserDao;
-import com.derek.db.DaoFactory;
-import com.derek.db.IBaseDao;
 import com.derek.eventbus.EventBus;
 import com.derek.eventbus.annotation.Subscriber;
 
-import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -32,7 +27,6 @@ public class MainActivity extends Activity {
 
     NoteCaretaker caretaker;
 
-    IBaseDao<User> userDao;
     private static final String dbPwd = "123456";
     private static final String dbName = "teacher.db";
 
@@ -45,17 +39,7 @@ public class MainActivity extends Activity {
 
         caretaker = new NoteCaretaker();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkPer()){
-                DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
-                userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
-            }
-        }else{
-            DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
-            userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
-        }
         // 数据库测试
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -81,8 +65,6 @@ public class MainActivity extends Activity {
              }
         }
         if (granted){
-            DaoFactory.getInstance().init(getApplicationContext(),dbPwd,dbName);
-            userDao = DaoFactory.getInstance().getDataHelper(UserDao.class,User.class);
         }else {
             checkPer();
         }
@@ -100,10 +82,6 @@ public class MainActivity extends Activity {
                 break;
             case R.id.btn_query:
             {
-                User where=new User();
-                where.setName("teacher");
-                List<User> list=userDao.query(where);
-                Log.i(TAG,"查询到  "+ ((list == null) ? "0" : list.size() )+"  条数据");
             }
                 break;
             case R.id.btn_open:
@@ -119,34 +97,22 @@ public class MainActivity extends Activity {
             {
                 for (int i = 1;i<6;i++)
                 {
-                    User user=new User(i,"teacher","123456" + i);
-                    userDao.insert(user);
                 }
             }
                 break;
 
             case R.id.btn_update:
             {
-                User user=new User(1,"teacher","1234561");
-                User entity = new User(100,"derek","check");
-                userDao.update(entity,user);
             }
                 break;
 
             case R.id.btn_delete:
             {
-                User user=new User(2,"teacher","1234562");
-                userDao.delete(user);
             }
                 break;
 
             case R.id.btn_log:
             {
-                User where = new User();
-                List<User> list=userDao.query(where);
-                for (int i = 0;i<list.size();i++){
-                    Log.e("derek", list.get(i).toString());
-                }
             }
                 break;
 
