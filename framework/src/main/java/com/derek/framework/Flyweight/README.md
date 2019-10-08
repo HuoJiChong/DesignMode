@@ -57,11 +57,9 @@ Message.next()
             }
 
             for (int i = 0; i < pendingIdleHandlerCount; i++) {
-               
             }
 
             pendingIdleHandlerCount = 0;
-
             nextPollTimeoutMillis = 0;
         }
     }
@@ -83,7 +81,6 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
             jniThrowRuntimeException(env, "Unable to allocate native queue");
             return;
         }
-    
         nativeMessageQueue->incStrong(env);
         android_os_MessageQueue_setNativeMessageQueue(env, obj, nativeMessageQueue);
     }
@@ -109,7 +106,6 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
     
 创建了一个Native层的Looper,然后这个Lopper设置给了当前线程。也就是说Java层的MessageQueue和Looper在Native层也都有，但是，他们的功能并不是一一对应的。
 那么看看Lopper究竟做了什么，构造函数：
-
     
     Looper::Looper(bool allowNonCallbacks) :
         mAllowNonCallbacks(allowNonCallbacks), mSendingMessage(false),mResponseIndex(0), mNextMessageUptime(LLONG_MAX) {

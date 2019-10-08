@@ -1,4 +1,4 @@
-package com.derek.framework;
+package com.derek.framework.Test;
 
 import android.content.Intent;
 
@@ -34,20 +34,89 @@ import com.derek.framework.Visitor.BusinessReport;
 import com.derek.framework.Visitor.CEOVisitor;
 import com.derek.framework.Visitor.CTOVisitor;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
+
+/**
+ * 线程是属于异步计算模型，所以你不可能直接从别的线程中得到方法返回值。 这时候，Future就出场了。
+ * Futrue可以监视目标线程调用call的情况，当你调用Future的get()方法以获得结果时，当前线程就开始阻塞，直接call方法结束返回结果。
+ * Future引用对象指向的实际是FutureTask。
+ */
+class MyCallable implements Callable<String> {
+
+    @Override
+    public String call() throws Exception {
+        System.out.println("my callable call,do some thing cost time");
+        Thread.sleep(5000);
+        return "OK";
+    }
+}
 
 public class Client {
+
+    static class Num{
+        int num = 10;
+        long num2 = 10;
+        public Num(){
+            num = 30;
+        }
+    }
+
     public static void main(String argv[]){
 
-        ticket();
+//        ticket();
+
+        Num a = new Num();
+        System.out.println("methodTest：" + a.num);
+
+//        AutoBoolean
+
+
+//        try {
+//            Class clazz = Class.forName("com.derek.framework.Client$Num");
+//            Field field = clazz.getDeclaredField("num2");
+//
+//            System.out.println("filed " + field.getType().toString());
+//            System.out.println("filed " + field.getGenericType().toString());
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchFieldException e) {
+//            e.printStackTrace();
+//        }
+
+    }
+
+    static void futureTask() throws ExecutionException, InterruptedException {
+        /**
+         * feature
+         */
+        ExecutorService service = Executors.newCachedThreadPool();
+        Future<String> future = service.submit(new MyCallable());
+        System.out.println("future do something.....");
+        System.out.println("future get result " + future.get()); // 等待结果发生
+        System.out.println("future Completed!!!!!!");
+        System.out.println("============================================");
+        System.out.println("============================================");
+        MyCallable callable = new MyCallable();
+        final FutureTask<String> task = new FutureTask<>(callable);
+//        new Thread(task).start();
+        new Thread(){
+            @Override
+            public void run() {
+                task.run();
+            }
+        }.start();
+
+        System.out.println("task do something.....");
+        System.out.println("task get result " + task.get());
+        System.out.println("task Completed!!!!!!");
     }
 
     public void intent(){

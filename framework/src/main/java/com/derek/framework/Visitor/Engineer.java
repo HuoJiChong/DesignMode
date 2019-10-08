@@ -2,6 +2,9 @@ package com.derek.framework.Visitor;
 
 import java.util.Random;
 
+/**
+ * 工程师
+ */
 public class Engineer extends Staff {
 
     public Engineer(String name) {

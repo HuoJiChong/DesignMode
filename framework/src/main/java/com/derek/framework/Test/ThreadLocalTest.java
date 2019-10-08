@@ -1,4 +1,4 @@
-package com.derek.framework;
+package com.derek.framework.Test;
 
 public class ThreadLocalTest {
     ThreadLocal<Long> longLocal = new ThreadLocal<>();
