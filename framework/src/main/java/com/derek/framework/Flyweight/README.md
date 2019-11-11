@@ -87,7 +87,7 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
     
     static void android_os_MessageQueue_setNativeMessageQueue(JNIEnv* env, jobject messageQueueObj,
             NativeMessageQueue* nativeMessageQueue) {
-            // 设置Java层的mPtr字段， 将NativeMessageQueue对象转换为一个整型变量
+            // 设置Java层的mPtr字段， 将NativeMessageQueue对象转换为一个整型变量，把nativeMessageQueue对象的地址存到mPtr。
         env->SetIntField(messageQueueObj, gMessageQueueClassInfo.mPtr,
                  reinterpret_cast<jint>(nativeMessageQueue));
     }
@@ -97,10 +97,10 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
  NativeMessageQueue对象指针。先来看看NativeMessageQueue类的构造函数。
  
     NativeMessageQueue::NativeMessageQueue() : mInCallback(false), mExceptionObj(NULL) {
-        mLooper = Looper::getForThread();
+        mLooper = Looper::getForThread(); //获取TLS中的Looper对象，相当于Java的Looper.myLooper();
         if (mLooper == NULL) {
-            mLooper = new Looper(false);
-            Looper::setForThread(mLooper);
+            mLooper = new Looper(false); // 创建Native层的Looper
+            Looper::setForThread(mLooper);  // 保存Native层的Looper到TLS中，功能相当于Java层的Looper.prepare(),(ThreadLocal.set());
         }
     }
     
@@ -129,11 +129,11 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
         LOG_ALWAYS_FATAL_IF(mEpollFd < 0, "Could not create epoll instance.  errno=%d", errno);
         
         struct epoll_event eventItem;
-        memset(& eventItem, 0, sizeof(epoll_event)); // zero out unused members of data field union
+        memset(& eventItem, 0, sizeof(epoll_event)); // 将未使用的数据区域进行置零操作
         // 设置事件类型和文件描述符
-        eventItem.events = EPOLLIN;
+        eventItem.events = EPOLLIN; // 可读事件
         eventItem.data.fd = mWakeReadPipeFd;
-        // 3、监听事件
+        // 3、将唤醒时间（mWakeReadPipeFd）添加到epoll实例（mEpollFd）
         result = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, mWakeReadPipeFd, & eventItem);
         LOG_ALWAYS_FATAL_IF(result != 0, "Could not add wake read pipe to epoll instance.  errno=%d",
                 errno);
@@ -184,11 +184,13 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
         int result = ALOOPER_POLL_WAKE;
         mResponses.clear();
         mResponseIndex = 0;
-    
-        struct epoll_event eventItems[EPOLL_MAX_EVENTS];
-        // 1、 从管道中读取事件
+        mPolling = true;  // 即将处于Idle状态
+        
+        struct epoll_event eventItems[EPOLL_MAX_EVENTS]; // fd最大个数为16，
+        // 1、 从管道中读取事件；等待时间发生或超时，在nativeWake()方法，向管道写端写入字符，则该方法返回。
         int eventCount = epoll_wait(mEpollFd, eventItems, EPOLL_MAX_EVENTS, timeoutMillis);
     
+        mPolling = false; // 不在处于Idle状态
         // 获取锁
         mLock.lock();
     
@@ -198,22 +200,23 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
                 goto Done;
             }
             ALOGW("Poll failed with an unexpected error, errno=%d", errno);
-            result = ALOOPER_POLL_ERROR;
+            result = ALOOPER_POLL_ERROR;  // epoll事件个数小于0，发生错误，直接跳转Done;
             goto Done;
         }
     
         // Check for poll timeout.
         if (eventCount == 0) {
-                result = ALOOPER_POLL_TIMEOUT;
-                goto Done;
-            }
-    
+            result = ALOOPER_POLL_TIMEOUT;  // epoll事件个数等于0，发生超时，直接跳转Done;
+            goto Done;
+        }
+        
+        // 循环遍历，处理所有的事件
         for (int i = 0; i < eventCount; i++) {
             int fd = eventItems[i].data.fd;
             uint32_t epollEvents = eventItems[i].events;
             if (fd == mWakeReadPipeFd) {
                 if (epollEvents & EPOLLIN) {
-                    awoken();
+                    awoken(); // 已经唤醒了，则读取并清空管道数据
                 } else {
                     ALOGW("Ignoring unexpected epoll events 0x%x on wake read pipe.", epollEvents);
                 }
@@ -225,6 +228,7 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
                     if (epollEvents & EPOLLOUT) events |= ALOOPER_EVENT_OUTPUT;
                     if (epollEvents & EPOLLERR) events |= ALOOPER_EVENT_ERROR;
                     if (epollEvents & EPOLLHUP) events |= ALOOPER_EVENT_HANGUP;
+                    // 处理request,则生成对应的response对象，push到响应数组。
                     pushResponse(events, mRequests.valueAt(requestIndex));
                 } else {
                     ALOGW("Ignoring unexpected epoll events 0x%x on fd %d that is "
@@ -276,6 +280,8 @@ mPtr存储了Native层的消息队列对象，也就是说Native层还有一个M
 它能够发送消息，取消息，处理消息。
 
 那么Android为什么要有两套消息机制呢？我们知道Android是支持纯native开发的，因此，在Native层实现消息机制是必须的，另外，Android系统的核心组件也都是运行在Native世界，各组件之间也需要通信，这样一来Native层的消息机制就变得很重要。
+
+
 
 
 
