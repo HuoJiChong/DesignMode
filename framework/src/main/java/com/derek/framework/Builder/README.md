@@ -1092,7 +1092,7 @@ WindowManager是注册到ContextImpl中的，而getSystemService也是Context定
     }
 
 综上，视图树绘制代码中主要分为下面几个步骤。
-* 1、判断是使用CPU还是CPU绘制
+* 1、判断是使用CPU还是GPU绘制
 * 2、获取绘制表面Surface对象
 * 3、通过Surface对象获取并锁定Canvas对象
 * 4、从DecorView开始发起整颗视图树的绘制流程
